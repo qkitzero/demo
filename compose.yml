@@ -3,7 +3,7 @@ services:
     build:
       context: ../auth
       dockerfile: ./build/auth/Dockerfile
-    container_name: auth-server
+    container_name: demo-auth-server
     restart: always
     environment:
       - PORT=${AUTH_SERVER_PORT}
@@ -23,7 +23,7 @@ services:
 
   keycloak-server:
     image: quay.io/keycloak/keycloak:26.0.7
-    container_name: keycloak-server
+    container_name: demo-keycloak-server
     restart: always
     environment:
       KEYCLOAK_ADMIN: admin
@@ -45,7 +45,7 @@ services:
 
   keycloak-db:
     image: mysql:8.0
-    container_name: keycloak-db
+    container_name: demo-keycloak-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${KEYCLOAK_DB_ROOT_PASSWORD}
@@ -67,7 +67,7 @@ services:
     build:
       context: ../user
       dockerfile: ./build/user/Dockerfile
-    container_name: user-server
+    container_name: demo-user-server
     restart: always
     environment:
       - PORT=${USER_SERVER_PORT}
@@ -76,7 +76,7 @@ services:
       - DB_HOST=${USER_DB_HOST}
       - DB_PORT=${USER_DB_PORT}
       - DB_NAME=${USER_DB_NAME}
-      - AUTH_SERVICE_HOST=${AUTH_SERVICE_HOST}
+      - AUTH_SERVICE_HOST=${AUTH_SERVER_HOST}
       - AUTH_SERVICE_PORT=${AUTH_SERVER_EXTERNAL_PORT}
     depends_on:
       user-db:
@@ -92,7 +92,7 @@ services:
 
   user-db:
     image: mysql:8.0
-    container_name: user-db
+    container_name: demo-user-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${USER_DB_ROOT_PASSWORD}
@@ -110,9 +110,32 @@ services:
     volumes:
       - user-db-data:/var/lib/mysql
 
+  auth-grpc-gateway:
+    build:
+      context: ../auth
+      dockerfile: ./build/gateway/Dockerfile
+    container_name: demo-auth-grpc-gateway
+    restart: always
+    environment:
+      - GRPC_GATEWAY_PORT=${AUTH_GRPC_GATEWAY_PORT}
+      - SERVER_HOST=${AUTH_SERVER_HOST}
+      - SERVER_PORT=${AUTH_SERVER_PORT}
+    ports:
+      - "${AUTH_GRPC_GATEWAY_EXTERNAL_PORT}:${AUTH_GRPC_GATEWAY_PORT}"
+
+  user-grpc-gateway:
+    build:
+      context: ../user
+      dockerfile: ./build/gateway/Dockerfile
+    container_name: demo-user-grpc-gateway
+    restart: always
+    environment:
+      - GRPC_GATEWAY_PORT=${USER_GRPC_GATEWAY_PORT}
+      - SERVER_HOST=${USER_SERVER_HOST}
+      - SERVER_PORT=${USER_SERVER_PORT}
+    ports:
+      - "${USER_GRPC_GATEWAY_EXTERNAL_PORT}:${USER_GRPC_GATEWAY_PORT}"
+
 volumes:
   keycloak-db-data:
   user-db-data:
-
-networks:
-  shared:
