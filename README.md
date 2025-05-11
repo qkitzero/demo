@@ -1,4 +1,4 @@
-# Demo App
+# Microservices Architecture Demo
 
 - Auth Service
 - User Service
