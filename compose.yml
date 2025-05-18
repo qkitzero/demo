@@ -1,7 +1,7 @@
 services:
   auth-server:
     build:
-      context: ../auth
+      context: ../auth-service
       dockerfile: ./build/auth/Dockerfile
     container_name: demo-auth-server
     restart: always
@@ -65,7 +65,7 @@ services:
 
   user-server:
     build:
-      context: ../user
+      context: ../user-service
       dockerfile: ./build/user/Dockerfile
     container_name: demo-user-server
     restart: always
@@ -112,12 +112,12 @@ services:
 
   auth-grpc-gateway:
     build:
-      context: ../auth
+      context: ../auth-service
       dockerfile: ./build/gateway/Dockerfile
     container_name: demo-auth-grpc-gateway
     restart: always
     environment:
-      - GRPC_GATEWAY_PORT=${AUTH_GRPC_GATEWAY_PORT}
+      - GRPC_GATEWAY_PORT=${AUTH_GRPC_GATEWAY_CONTAINER_PORT}
       - SERVER_HOST=${AUTH_SERVER_HOST}
       - SERVER_PORT=${AUTH_SERVER_CONTAINER_PORT}
     ports:
@@ -125,12 +125,12 @@ services:
 
   user-grpc-gateway:
     build:
-      context: ../user
+      context: ../user-service
       dockerfile: ./build/gateway/Dockerfile
     container_name: demo-user-grpc-gateway
     restart: always
     environment:
-      - GRPC_GATEWAY_PORT=${USER_GRPC_GATEWAY_PORT}
+      - GRPC_GATEWAY_PORT=${USER_GRPC_GATEWAY_CONTAINER_PORT}
       - SERVER_HOST=${USER_SERVER_HOST}
       - SERVER_PORT=${USER_SERVER_CONTAINER_PORT}
     ports:
