@@ -41,7 +41,7 @@ services:
     ports:
       - "${KEYCLOAK_SERVER_HOST_PORT}:${KEYCLOAK_SERVER_CONTAINER_PORT}"
     volumes:
-      - ../auth/keycloak/themes:/opt/keycloak/themes
+      - ../auth-service/keycloak/themes:/opt/keycloak/themes
 
   keycloak-db:
     image: mysql:8.0
